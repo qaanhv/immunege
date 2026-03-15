@@ -1,5 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { auth, db } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export type MealType = 'Morning' | 'Lunch' | 'Snack';
 
@@ -83,6 +86,12 @@ export interface MenuState {
   addFlagIncident: (incident: Omit<FlagIncident, 'id'>) => void;
   updateFlagIncident: (id: string, updates: Partial<FlagIncident>) => void;
   removeFlagIncident: (id: string) => void;
+
+  currentUser: any | null;
+  isLoading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  syncWithFirebase: () => Promise<void>;
 }
 
 const initialDishes: Dish[] = [
@@ -130,6 +139,8 @@ export const useMenuStore = create<MenuState>()(
       diaryEntries: [],
       flagIncidents: [],
       notifications: [],
+      currentUser: null,
+      isLoading: true,
 
       showNotification: (message, type = 'success') => {
         const id = Math.random().toString(36).substring(7);
@@ -239,10 +250,77 @@ export const useMenuStore = create<MenuState>()(
 
       removeFlagIncident: (id) => set((state) => ({
         flagIncidents: state.flagIncidents.filter(inc => inc.id !== id)
-      }))
+      })),
+
+      signInWithGoogle: async () => {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      },
+
+      signOut: async () => {
+        await auth.signOut();
+        set({ currentUser: null, dishes: initialDishes, flaggedIngredients: [], groceryItems: [], flagIncidents: [], diaryEntries: [], plannedMeals: [] });
+      },
+
+      syncWithFirebase: async () => {
+        const user = get().currentUser;
+        if (!user) return;
+        const state = get();
+        await setDoc(doc(db, 'users', user.uid), {
+          dishes: state.dishes,
+          flaggedIngredients: state.flaggedIngredients,
+          plannedMeals: state.plannedMeals,
+          groceryItems: state.groceryItems,
+          diaryEntries: state.diaryEntries,
+          flagIncidents: state.flagIncidents,
+          updatedAt: new Date().toISOString()
+        });
+      }
     }),
     {
       name: 'immunege-ledger-storage',
+      partialize: (state) => ({ 
+        dishes: state.dishes,
+        flaggedIngredients: state.flaggedIngredients,
+        plannedMeals: state.plannedMeals,
+        groceryItems: state.groceryItems,
+        diaryEntries: state.diaryEntries,
+        flagIncidents: state.flagIncidents
+      }),
     }
   )
 );
+
+// Auth Listener & Real-time Sync
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    const docRef = doc(db, 'users', user.uid);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      useMenuStore.setState({ 
+        currentUser: user,
+        dishes: data.dishes || [],
+        flaggedIngredients: data.flaggedIngredients || [],
+        plannedMeals: data.plannedMeals || [],
+        groceryItems: data.groceryItems || [],
+        diaryEntries: data.diaryEntries || [],
+        flagIncidents: data.flagIncidents || [],
+        isLoading: false
+      });
+    } else {
+      useMenuStore.setState({ currentUser: user, isLoading: false });
+    }
+  } else {
+    useMenuStore.setState({ currentUser: null, isLoading: false });
+  }
+});
+
+// Middleware to auto-sync to Firebase on changes
+useMenuStore.subscribe((state, prevState) => {
+  if (state.currentUser && JSON.stringify(state.dishes) !== JSON.stringify(prevState.dishes)) {
+     // We can add a debounced sync here if needed
+     state.syncWithFirebase();
+  }
+});

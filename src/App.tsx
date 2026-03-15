@@ -18,7 +18,9 @@ import {
   ShieldAlert,
   Check,
   X,
-  Settings
+  Settings,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
@@ -36,6 +38,9 @@ const App: React.FC = () => {
   const dishes = useMenuStore((state) => state.dishes);
   const notifications = useMenuStore((state) => state.notifications);
   const removeNotification = useMenuStore((state) => state.removeNotification);
+  const currentUser = useMenuStore((state) => state.currentUser);
+  const signInWithGoogle = useMenuStore((state) => state.signInWithGoogle);
+  const signOut = useMenuStore((state) => state.signOut);
 
   const filteredDishes = useMemo(() => {
     return dishes.filter(dish => {
@@ -60,6 +65,25 @@ const App: React.FC = () => {
               <button onClick={() => setIsDiaryOpen(true)} className="text-gray-300 hover:text-[#1A1A1A] transition-colors"><PenLine size={12} /></button>
             </div>
           </div>
+
+          {!currentUser ? (
+            <button 
+              onClick={signInWithGoogle}
+              className="flex items-center gap-3 px-4 py-3 bg-[#f2f2f2] text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest border border-dashed border-gray-300 hover:border-[#8A9A5B] transition-all"
+            >
+              <LogIn size={14} className="text-[#8A9A5B]" /> Login for Cloud Sync
+            </button>
+          ) : (
+            <div className="flex items-center justify-between px-4 py-3 bg-[#F9F8F6] border border-structural">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full overflow-hidden border border-[#8A9A5B]">
+                  <img src={currentUser.photoURL} alt="user" className="w-full h-full object-cover" />
+                </div>
+                <span className="text-[9px] font-bold uppercase tracking-tight truncate max-w-[80px]">{currentUser.displayName.split(' ')[0]}</span>
+              </div>
+              <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-colors"><LogOut size={12} /></button>
+            </div>
+          )}
 
           <div className="flex flex-col gap-5">
             <div>
