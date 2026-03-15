@@ -42,6 +42,8 @@ const App: React.FC = () => {
   const isLoading = useMenuStore((state) => state.isLoading);
   const signInWithGoogle = useMenuStore((state) => state.signInWithGoogle);
   const signOut = useMenuStore((state) => state.signOut);
+  const isSyncing = useMenuStore((state) => state.isSyncing);
+  const lastSyncedAt = useMenuStore((state) => state.lastSyncedAt);
 
   const filteredDishes = useMemo(() => {
     return dishes.filter(dish => {
@@ -75,12 +77,12 @@ const App: React.FC = () => {
                     <div className={clsx(
                       "w-1.5 h-1.5 rounded-full shadow-sm",
                       isLoading ? "bg-amber-400" : "bg-[#8A9A5B]",
-                      useMenuStore.getState().isSyncing && "animate-pulse"
+                      isSyncing && "animate-pulse"
                     )} />
                     <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]">Cloud Linked</span>
                   </div>
-                  {useMenuStore.getState().lastSyncedAt && (
-                    <span className="text-[7px] text-gray-400 uppercase tracking-tighter">Synced {useMenuStore.getState().lastSyncedAt}</span>
+                  {lastSyncedAt && (
+                    <span className="text-[7px] text-gray-400 uppercase tracking-tighter">Synced {lastSyncedAt}</span>
                   )}
                   {isLoading && <span className="text-[7px] text-amber-500 uppercase font-black animate-pulse">Initializing...</span>}
                 </div>
@@ -150,7 +152,7 @@ const App: React.FC = () => {
         <div className="flex gap-2 items-center">
           {currentUser ? (
             <div className="flex items-center gap-2">
-              {useMenuStore.getState().isSyncing && (
+              {isSyncing && (
                 <div className="w-1.5 h-1.5 rounded-full bg-[#8A9A5B] animate-pulse" />
               )}
               <button 
