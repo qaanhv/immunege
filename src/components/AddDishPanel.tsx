@@ -87,7 +87,7 @@ export const AddDishPanel: React.FC<{ isOpen: boolean; onClose: () => void }> = 
     };
 
     addDish(newDish);
-    useMenuStore.getState().showNotification(`Đã thêm ${name} vào thực đơn`, 'success');
+    useMenuStore.getState().showNotification(`${name} added to menu`, 'success');
     
     // Reset
     setName('');

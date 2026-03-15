@@ -258,10 +258,10 @@ export const useMenuStore = create<MenuState>()(
           // Force account selection to avoid "flash" closure in some browsers
           provider.setCustomParameters({ prompt: 'select_account' });
           await signInWithPopup(auth, provider);
-          get().showNotification("Đã đăng nhập thành công!", "success");
+          get().showNotification("Logged in successfully!", "success");
         } catch (error: any) {
           console.error("Auth Error:", error);
-          get().showNotification(`Lỗi đăng nhập: ${error.message}`, "info");
+          get().showNotification(`Login failed: ${error.message}`, "info");
         }
       },
 
@@ -269,7 +269,7 @@ export const useMenuStore = create<MenuState>()(
         try {
           await auth.signOut();
           set({ currentUser: null, dishes: initialDishes, flaggedIngredients: [], groceryItems: [], flagIncidents: [], diaryEntries: [], plannedMeals: [] });
-          get().showNotification("Đã đăng xuất", "info");
+          get().showNotification("Logged out successfully", "info");
         } catch (error) {
           console.error("Sign Out Error:", error);
         }
