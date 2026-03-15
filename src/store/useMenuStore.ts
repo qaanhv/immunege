@@ -324,7 +324,12 @@ export const useMenuStore = create<MenuState>()(
 // Auth Listener & Real-time Sync
 let unsubscribe: (() => void) | null = null;
 
+// Safety timeout to prevent "Connecting Forever" if internet is patchy
+let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+
 auth.onAuthStateChanged((user) => {
+  if (loadingTimeout) clearTimeout(loadingTimeout);
+  
   if (unsubscribe) {
     unsubscribe();
     unsubscribe = null;
@@ -333,12 +338,20 @@ auth.onAuthStateChanged((user) => {
   if (user) {
     const docRef = doc(db, 'users', user.uid);
     
-    // Switch to onSnapshot for real-time sync
+    // Safety fallback: if cloud doesn't respond in 8 seconds, let user interact anyway
+    loadingTimeout = setTimeout(() => {
+      const state = useMenuStore.getState();
+      if (state.isLoading) {
+        useMenuStore.setState({ isLoading: false });
+        console.warn("Auth: Data sync timed out, continuing with local data.");
+      }
+    }, 8000);
+
     unsubscribe = onSnapshot(docRef, (docSnap) => {
       const data = docSnap.data();
-
+      
       if (docSnap.exists() && data) {
-        // Only update local state if it's not a change we just made ourselves
+        // Only update local state if it's not a change we just made ourselves (prevents loops)
         if (!docSnap.metadata.hasPendingWrites) {
           useMenuStore.setState({ 
             currentUser: user,
@@ -350,21 +363,27 @@ auth.onAuthStateChanged((user) => {
             flagIncidents: data.flagIncidents || [],
             isLoading: false
           });
-          console.log("Cloud Data Synced");
+          console.log("Auth: Cloud Data Synced Successfully");
+          if (loadingTimeout) clearTimeout(loadingTimeout);
         } else {
-          // If it IS our own write, we still need to stop the loading spinner
+          // It's our own write, just ensure we're not loading anymore
           useMenuStore.setState({ currentUser: user, isLoading: false });
         }
       } else {
-        // Document doesn't exist yet, but we are authenticated
+        // Document doesn't exist yet, likely a new user or first sync
         useMenuStore.setState({ currentUser: user, isLoading: false });
+        if (loadingTimeout) clearTimeout(loadingTimeout);
+        console.log("Auth: New cloud document or no data yet.");
       }
     }, (error) => {
-      console.error("Snapshot Error:", error);
+      console.error("Auth: Snapshot Error:", error);
       useMenuStore.setState({ isLoading: false });
+      if (loadingTimeout) clearTimeout(loadingTimeout);
     });
   } else {
+    // User logged out
     useMenuStore.setState({ currentUser: null, isLoading: false });
+    if (loadingTimeout) clearTimeout(loadingTimeout);
   }
 });
 
