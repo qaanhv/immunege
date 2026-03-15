@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 
 // These are placeholders. You will get these from the Firebase Console.
 const firebaseConfig = {
-  apiKey: "AIzaSyCarIL18IARdssslYntOOY-tCBVRGRrshw",
-  authDomain: "immunege.firebaseapp.com",
-  projectId: "immunege",
-  storageBucket: "immunege.firebasestorage.app",
-  messagingSenderId: "1001656113599",
-  appId: "1:1001656113599:web:3b3531ffc60b692675690a",
-  measurementId: "G-WJ84C9LGXQ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
