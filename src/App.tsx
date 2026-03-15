@@ -67,6 +67,13 @@ const App: React.FC = () => {
             </div>
           </div>
 
+          {isLoading && (
+            <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-structural border-dashed animate-pulse">
+              <div className="w-3 h-3 rounded-full bg-[#8A9A5B]/30 animate-ping" />
+              <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Connecting...</span>
+            </div>
+          )}
+          
           {!isLoading && !currentUser && (
             <button 
               onClick={signInWithGoogle}
@@ -124,6 +131,11 @@ const App: React.FC = () => {
           <span className="font-editorial italic text-xs text-[#8A9A5B]">for Quynh Anh</span>
         </div>
         <div className="flex gap-2 items-center">
+          {isLoading && (
+            <div className="p-2 animate-pulse text-gray-300">
+              <LogIn size={18} />
+            </div>
+          )}
           {!isLoading && !currentUser && (
             <button 
               onClick={signInWithGoogle}

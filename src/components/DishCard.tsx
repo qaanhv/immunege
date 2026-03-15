@@ -24,7 +24,7 @@ export const DishCard: React.FC<DishCardProps> = memo(({ dish, onSelect }) => {
         <img 
           src={dish.imageUrl} 
           alt={dish.name}
-          className="w-full h-full object-cover saturate-[1.1] contrast-[1.1] sepia-[0.05] transition-transform duration-700 group-hover:scale-105"
+          className="w-full h-full object-cover saturate-[1.05] contrast-[1.1] sepia-[0.05] transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
         

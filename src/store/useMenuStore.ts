@@ -260,6 +260,7 @@ export const useMenuStore = create<MenuState>()(
       })),
 
       signInWithGoogle: async () => {
+        set({ isLoading: true });
         try {
           const provider = new GoogleAuthProvider();
           // Force account selection to avoid "flash" closure in some browsers

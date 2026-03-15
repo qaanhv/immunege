@@ -85,7 +85,16 @@ export const SettingsView: React.FC = () => {
         {/* Data Persistence Info */}
         <section className="flex flex-col gap-6">
           <div className="p-6 bg-white border-structural shadow-sm">
-            {store.currentUser ? (
+            {store.isLoading ? (
+              <div className="flex flex-col gap-4 animate-pulse">
+                <div className="flex items-center gap-3 text-gray-400">
+                  <Database size={20} />
+                  <h3 className="font-bold uppercase tracking-widest text-xs">Connecting...</h3>
+                </div>
+                <div className="h-4 bg-gray-100 w-3/4" />
+                <div className="h-4 bg-gray-100 w-1/2" />
+              </div>
+            ) : store.currentUser ? (
               <>
                 <div className="flex items-center gap-3 mb-4 text-[#8A9A5B]">
                   <Database size={20} />
