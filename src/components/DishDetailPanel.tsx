@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dish, useMenuStore, MealType } from '../store/useMenuStore';
 import { IngredientTag } from './IngredientTag';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, Edit3, Save, CalendarPlus, Plus, AlertOctagon, ShieldAlert, Sparkles, Wand2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { X, Trash2, Edit3, Save, CalendarPlus, Plus, AlertOctagon, ShieldAlert, Sparkles, Loader2, Image as ImageIcon } from 'lucide-react';
 import clsx from 'clsx';
 
 interface DishDetailPanelProps {
@@ -155,7 +155,7 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
             <div className="flex-1 overflow-y-auto">
               {/* Image Section */}
               <div className="w-full aspect-video md:aspect-[21/9] overflow-hidden border-structural-b bg-gray-100 relative group">
-                <img src={isEditing ? editImageUrl : dish.imageUrl} alt={dish.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img src={isEditing ? editImageUrl : dish.imageUrl} alt={dish.name} className="w-full h-full object-cover saturate-[1.1] contrast-[1.1] sepia-[0.05] transition-transform duration-700 group-hover:scale-105" />
                 {isEditing && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
                     <button 

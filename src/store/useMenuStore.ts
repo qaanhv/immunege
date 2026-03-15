@@ -1,8 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { auth, db } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup 
+} from 'firebase/auth';
+import { 
+  doc, 
+  setDoc, 
+  onSnapshot 
+} from 'firebase/firestore';
 
 export type MealType = 'Morning' | 'Lunch' | 'Snack';
 
@@ -310,26 +317,42 @@ export const useMenuStore = create<MenuState>()(
 );
 
 // Auth Listener & Real-time Sync
-auth.onAuthStateChanged(async (user) => {
+let unsubscribe: (() => void) | null = null;
+
+auth.onAuthStateChanged((user) => {
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
+
   if (user) {
     const docRef = doc(db, 'users', user.uid);
-    const docSnap = await getDoc(docRef);
     
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      useMenuStore.setState({ 
-        currentUser: user,
-        dishes: data.dishes || [],
-        flaggedIngredients: data.flaggedIngredients || [],
-        plannedMeals: data.plannedMeals || [],
-        groceryItems: data.groceryItems || [],
-        diaryEntries: data.diaryEntries || [],
-        flagIncidents: data.flagIncidents || [],
-        isLoading: false
-      });
-    } else {
-      useMenuStore.setState({ currentUser: user, isLoading: false });
-    }
+    // Switch to onSnapshot for real-time sync
+    unsubscribe = onSnapshot(docRef, (docSnap) => {
+      // Don't update local state if the change was made by this client (prevents loops)
+      if (docSnap.metadata.hasPendingWrites) return;
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        useMenuStore.setState({ 
+          currentUser: user,
+          dishes: data.dishes || [],
+          flaggedIngredients: data.flaggedIngredients || [],
+          plannedMeals: data.plannedMeals || [],
+          groceryItems: data.groceryItems || [],
+          diaryEntries: data.diaryEntries || [],
+          flagIncidents: data.flagIncidents || [],
+          isLoading: false
+        });
+        console.log("Real-time Sync: Data updated from cloud");
+      } else {
+        useMenuStore.setState({ currentUser: user, isLoading: false });
+      }
+    }, (error) => {
+      console.error("Snapshot Error:", error);
+      useMenuStore.setState({ isLoading: false });
+    });
   } else {
     useMenuStore.setState({ currentUser: null, isLoading: false });
   }
