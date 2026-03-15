@@ -253,28 +253,46 @@ export const useMenuStore = create<MenuState>()(
       })),
 
       signInWithGoogle: async () => {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
+        try {
+          const provider = new GoogleAuthProvider();
+          // Force account selection to avoid "flash" closure in some browsers
+          provider.setCustomParameters({ prompt: 'select_account' });
+          await signInWithPopup(auth, provider);
+          get().showNotification("Đã đăng nhập thành công!", "success");
+        } catch (error: any) {
+          console.error("Auth Error:", error);
+          get().showNotification(`Lỗi đăng nhập: ${error.message}`, "info");
+        }
       },
 
       signOut: async () => {
-        await auth.signOut();
-        set({ currentUser: null, dishes: initialDishes, flaggedIngredients: [], groceryItems: [], flagIncidents: [], diaryEntries: [], plannedMeals: [] });
+        try {
+          await auth.signOut();
+          set({ currentUser: null, dishes: initialDishes, flaggedIngredients: [], groceryItems: [], flagIncidents: [], diaryEntries: [], plannedMeals: [] });
+          get().showNotification("Đã đăng xuất", "info");
+        } catch (error) {
+          console.error("Sign Out Error:", error);
+        }
       },
 
       syncWithFirebase: async () => {
         const user = get().currentUser;
         if (!user) return;
         const state = get();
-        await setDoc(doc(db, 'users', user.uid), {
-          dishes: state.dishes,
-          flaggedIngredients: state.flaggedIngredients,
-          plannedMeals: state.plannedMeals,
-          groceryItems: state.groceryItems,
-          diaryEntries: state.diaryEntries,
-          flagIncidents: state.flagIncidents,
-          updatedAt: new Date().toISOString()
-        });
+        try {
+          await setDoc(doc(db, 'users', user.uid), {
+            dishes: state.dishes,
+            flaggedIngredients: state.flaggedIngredients,
+            plannedMeals: state.plannedMeals,
+            groceryItems: state.groceryItems,
+            diaryEntries: state.diaryEntries,
+            flagIncidents: state.flagIncidents,
+            updatedAt: new Date().toISOString()
+          });
+          console.log("Cloud Sync Successful");
+        } catch (error) {
+          console.error("Cloud Sync Error:", error);
+        }
       }
     }),
     {
@@ -319,8 +337,17 @@ auth.onAuthStateChanged(async (user) => {
 
 // Middleware to auto-sync to Firebase on changes
 useMenuStore.subscribe((state, prevState) => {
-  if (state.currentUser && JSON.stringify(state.dishes) !== JSON.stringify(prevState.dishes)) {
-     // We can add a debounced sync here if needed
-     state.syncWithFirebase();
+  if (state.currentUser) {
+    const hasChanged = 
+      JSON.stringify(state.dishes) !== JSON.stringify(prevState.dishes) ||
+      JSON.stringify(state.flaggedIngredients) !== JSON.stringify(prevState.flaggedIngredients) ||
+      JSON.stringify(state.plannedMeals) !== JSON.stringify(prevState.plannedMeals) ||
+      JSON.stringify(state.groceryItems) !== JSON.stringify(prevState.groceryItems) ||
+      JSON.stringify(state.diaryEntries) !== JSON.stringify(prevState.diaryEntries) ||
+      JSON.stringify(state.flagIncidents) !== JSON.stringify(prevState.flagIncidents);
+
+    if (hasChanged) {
+      state.syncWithFirebase();
+    }
   }
 });
