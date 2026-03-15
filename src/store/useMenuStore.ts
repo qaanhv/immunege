@@ -330,9 +330,18 @@ export const useMenuStore = create<MenuState>()(
 
 // Auth Listener & Real-time Sync
 let unsubscribe: (() => void) | null = null;
-
-// Safety timeout to prevent "Connecting Forever" if internet is patchy
 let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+
+// MASTER SAFETY TIMEOUT:
+// Clear loading state after 5 seconds no matter what, 
+// so the user can at least use local data.
+setTimeout(() => {
+  const state = useMenuStore.getState();
+  if (state.isLoading) {
+    console.warn("🏁 Master Safety Timeout: Forcing isLoading to false.");
+    useMenuStore.setState({ isLoading: false });
+  }
+}, 5000);
 
 auth.onAuthStateChanged((user) => {
   if (loadingTimeout) clearTimeout(loadingTimeout);
@@ -340,6 +349,7 @@ auth.onAuthStateChanged((user) => {
   if (unsubscribe) {
     unsubscribe();
     unsubscribe = null;
+    console.log("Auth: Previous Firebase listener unsubscribed.");
   }
 
   if (user) {
@@ -351,14 +361,15 @@ auth.onAuthStateChanged((user) => {
       if (state.isLoading) {
         useMenuStore.setState({ isLoading: false });
         console.warn("Auth: Data sync timed out, continuing with local data.");
+        state.showNotification("Cloud taking too long. Using local ledger for now.", "info");
       }
     }, 8000);
 
     unsubscribe = onSnapshot(docRef, (docSnap) => {
       const data = docSnap.data();
+      console.log("📡 Cloud Update Received", { exists: docSnap.exists(), hasPendingWrites: docSnap.metadata.hasPendingWrites });
       
       if (docSnap.exists() && data) {
-        // Only update local state if it's not a change we just made ourselves (prevents loops)
         if (!docSnap.metadata.hasPendingWrites) {
           useMenuStore.setState({ 
             currentUser: user,
@@ -368,27 +379,26 @@ auth.onAuthStateChanged((user) => {
             groceryItems: data.groceryItems || [],
             diaryEntries: data.diaryEntries || [],
             flagIncidents: data.flagIncidents || [],
-            isLoading: false
+            isLoading: false,
+            lastSyncedAt: new Date().toLocaleTimeString() 
           });
-          console.log("Auth: Cloud Data Synced Successfully");
+          console.log("✅ Cloud Sync: Success");
           if (loadingTimeout) clearTimeout(loadingTimeout);
         } else {
-          // It's our own write, just ensure we're not loading anymore
           useMenuStore.setState({ currentUser: user, isLoading: false });
         }
       } else {
-        // Document doesn't exist yet, likely a new user or first sync
+        console.log("ℹ️ No cloud document found, using local only.");
         useMenuStore.setState({ currentUser: user, isLoading: false });
         if (loadingTimeout) clearTimeout(loadingTimeout);
-        console.log("Auth: New cloud document or no data yet.");
       }
     }, (error) => {
-      console.error("Auth: Snapshot Error:", error);
+      console.error("❌ Snapshot Error:", error);
       useMenuStore.setState({ isLoading: false });
       if (loadingTimeout) clearTimeout(loadingTimeout);
     });
   } else {
-    // User logged out
+    console.log("👤 User is signed out.");
     useMenuStore.setState({ currentUser: null, isLoading: false });
     if (loadingTimeout) clearTimeout(loadingTimeout);
   }
