@@ -39,6 +39,7 @@ const App: React.FC = () => {
   const notifications = useMenuStore((state) => state.notifications);
   const removeNotification = useMenuStore((state) => state.removeNotification);
   const currentUser = useMenuStore((state) => state.currentUser);
+  const isLoading = useMenuStore((state) => state.isLoading);
   const signInWithGoogle = useMenuStore((state) => state.signInWithGoogle);
   const signOut = useMenuStore((state) => state.signOut);
 
@@ -66,22 +67,21 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {!currentUser ? (
+          {!isLoading && !currentUser && (
             <button 
               onClick={signInWithGoogle}
               className="flex items-center gap-3 px-4 py-3 bg-[#f2f2f2] text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest border border-dashed border-gray-300 hover:border-[#8A9A5B] transition-all"
             >
               <LogIn size={14} className="text-[#8A9A5B]" /> Login for Cloud Sync
             </button>
-          ) : (
+          )}
+
+          {!isLoading && currentUser && (
             <div className="flex items-center justify-between px-4 py-3 bg-[#F9F8F6] border border-structural">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full overflow-hidden border border-[#8A9A5B]">
-                  <img src={currentUser.photoURL} alt="user" className="w-full h-full object-cover" />
-                </div>
-                <span className="text-[9px] font-bold uppercase tracking-tight truncate max-w-[80px]">{currentUser.displayName.split(' ')[0]}</span>
-              </div>
-              <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-colors"><LogOut size={12} /></button>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-[#8A9A5B]">Cloud Sync Active</span>
+              <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-all flex items-center gap-2" title="Sign Out">
+                <LogOut size={12} />
+              </button>
             </div>
           )}
 
@@ -124,7 +124,7 @@ const App: React.FC = () => {
           <span className="font-editorial italic text-xs text-[#8A9A5B]">for Quynh Anh</span>
         </div>
         <div className="flex gap-2 items-center">
-          {!currentUser ? (
+          {!isLoading && !currentUser && (
             <button 
               onClick={signInWithGoogle}
               className="p-2 border-structural text-[#8A9A5B] hover:bg-gray-50 transition-all"
@@ -132,12 +132,14 @@ const App: React.FC = () => {
             >
               <LogIn size={18} />
             </button>
-          ) : (
+          )}
+          {!isLoading && currentUser && (
             <button 
               onClick={signOut}
-              className="w-8 h-8 rounded-full overflow-hidden border border-[#8A9A5B] active:scale-90 transition-transform"
+              className="p-2 border-structural text-red-400 active:scale-90 transition-transform"
+              title="Logout"
             >
-              <img src={currentUser.photoURL} alt="user" className="w-full h-full object-cover" />
+              <LogOut size={18} />
             </button>
           )}
           <button onClick={() => setIsDiaryOpen(true)} className="p-2 border-structural"><PenLine size={18} /></button>
