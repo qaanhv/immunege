@@ -290,10 +290,9 @@ export const useMenuStore = create<MenuState>()(
 
       syncWithFirebase: async () => {
         const user = get().currentUser;
-        if (!user) {
-          console.warn("Sync skipped: No user logged in");
-          return;
-        }
+        if (!user || get().isSyncing) return;
+        
+        set({ isSyncing: true });
         const state = get();
         try {
           console.log(`Syncing to Cloud for user ${user.uid}...`, { dishes: state.dishes.length });
@@ -373,10 +372,18 @@ auth.onAuthStateChanged((user) => {
 
     unsubscribe = onSnapshot(docRef, (docSnap) => {
       const data = docSnap.data();
-      console.log("📡 Cloud Update Received", { exists: docSnap.exists(), hasPendingWrites: docSnap.metadata.hasPendingWrites });
+      const state = useMenuStore.getState();
       
-      if (docSnap.exists() && data) {
-        if (!docSnap.metadata.hasPendingWrites) {
+      console.log("📡 Cloud Update Received", { 
+        exists: docSnap.exists(), 
+        hasPendingWrites: docSnap.metadata.hasPendingWrites,
+        isSyncing: state.isSyncing 
+      });
+      
+      // PROTECTION: If we are CURRENTLY sending local changes to the cloud (isSyncing),
+      // or if Firestore already knows about our pending writes,
+      // DO NOT let the incoming cloud snapshot overwrite our local state.
+      if (docSnap.exists() && data && !state.isSyncing && !docSnap.metadata.hasPendingWrites) {
           useMenuStore.setState({ 
             currentUser: user,
             dishes: data.dishes || [],
@@ -388,15 +395,11 @@ auth.onAuthStateChanged((user) => {
             isLoading: false,
             lastSyncedAt: new Date().toLocaleTimeString() 
           });
-          console.log("✅ Cloud Sync: Success");
+          console.log("✅ Cloud Sync: Local State Updated from Cloud");
           if (loadingTimeout) clearTimeout(loadingTimeout);
-        } else {
-          useMenuStore.setState({ currentUser: user, isLoading: false });
-        }
       } else {
-        console.log("ℹ️ No cloud document found, using local only.");
-        useMenuStore.setState({ currentUser: user, isLoading: false });
-        if (loadingTimeout) clearTimeout(loadingTimeout);
+        // Just ensure we aren't stuck in a loading state
+        if (state.isLoading) useMenuStore.setState({ isLoading: false });
       }
     }, (error) => {
       console.error("❌ Snapshot Error:", error);
