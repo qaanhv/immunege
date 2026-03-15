@@ -87,13 +87,23 @@ export const SettingsView: React.FC = () => {
         <section className="flex flex-col gap-6">
           <div className="p-6 bg-white border-structural shadow-sm">
             {store.isLoading ? (
-              <div className="flex flex-col gap-4 animate-pulse">
-                <div className="flex items-center gap-3 text-gray-400">
-                  <Database size={20} />
-                  <h3 className="font-bold uppercase tracking-widest text-xs">Connecting...</h3>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 animate-pulse">
+                  <div className="flex items-center gap-3 text-gray-400">
+                    <Database size={20} className={navigator.onLine ? "animate-spin" : ""} />
+                    <h3 className="font-bold uppercase tracking-widest text-xs">
+                      {navigator.onLine ? "Searching Cloud..." : "No Internet Connection"}
+                    </h3>
+                  </div>
+                  <div className="h-4 bg-gray-100 w-3/4" />
+                  <div className="h-4 bg-gray-100 w-1/2" />
                 </div>
-                <div className="h-4 bg-gray-100 w-3/4" />
-                <div className="h-4 bg-gray-100 w-1/2" />
+                <button 
+                  onClick={() => store.forceStopLoading()}
+                  className="text-[9px] text-[#8A9A5B] font-bold uppercase tracking-widest hover:underline text-left mt-2"
+                >
+                  Skip Waiting / Use Offline
+                </button>
               </div>
             ) : store.currentUser ? (
               <>

@@ -101,6 +101,7 @@ export interface MenuState {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   syncWithFirebase: () => Promise<void>;
+  forceStopLoading: () => void;
 }
 
 const initialDishes: Dish[] = [
@@ -312,6 +313,11 @@ export const useMenuStore = create<MenuState>()(
           set({ isSyncing: false });
           get().showNotification(`Cloud Sync Failed: ${error.message}`, "error");
         }
+      },
+
+      forceStopLoading: () => {
+        console.warn("User-initiated loading stop.");
+        set({ isLoading: false });
       }
     }),
     {

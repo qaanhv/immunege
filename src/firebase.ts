@@ -13,6 +13,13 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// Debug log for configuration (masked for safety)
+if (!firebaseConfig.apiKey) {
+  console.error("🚨 CRITICAL: Firebase API Key is missing! Cloud sync will not work.");
+} else {
+  console.log("🔥 Firebase: Config loaded", { authDomain: firebaseConfig.authDomain ? "✅" : "❌" });
+}
+
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);

@@ -96,9 +96,19 @@ const App: React.FC = () => {
           {!currentUser && (
             <div className="flex flex-col gap-3">
               {isLoading ? (
-                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-structural border-dashed animate-pulse">
-                  <div className="w-3 h-3 rounded-full bg-gray-200 animate-ping" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Searching Account...</span>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-structural border-dashed">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">
+                      {navigator.onLine ? "Searching Account..." : "Waiting for Network..."}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => useMenuStore.getState().forceStopLoading()}
+                    className="text-[8px] text-[#8A9A5B] font-bold uppercase tracking-widest hover:underline transition-all py-1 bg-[#8A9A5B]/5 border border-[#8A9A5B]/10"
+                  >
+                    Skip Waiting / Use Offline
+                  </button>
                 </div>
               ) : (
                 <button 
@@ -169,9 +179,12 @@ const App: React.FC = () => {
           ) : (
             <>
               {isLoading ? (
-                <div className="p-2 animate-pulse text-gray-300">
-                  <LogIn size={18} />
-                </div>
+                <button 
+                  onClick={() => useMenuStore.getState().forceStopLoading()}
+                  className="p-2 animate-pulse text-[#8A9A5B]"
+                >
+                  <LogIn size={18} className="opacity-50" />
+                </button>
               ) : (
                 <button 
                   onClick={signInWithGoogle}
