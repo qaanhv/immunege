@@ -67,29 +67,32 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {isLoading && (
-            <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-structural border-dashed animate-pulse">
-              <div className="w-3 h-3 rounded-full bg-[#8A9A5B]/30 animate-ping" />
-              <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Connecting...</span>
-            </div>
-          )}
-          
-          {!isLoading && !currentUser && (
-            <button 
-              onClick={signInWithGoogle}
-              className="flex items-center gap-3 px-4 py-3 bg-[#f2f2f2] text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest border border-dashed border-gray-300 hover:border-[#8A9A5B] transition-all"
-            >
-              <LogIn size={14} className="text-[#8A9A5B]" /> Login for Cloud Sync
-            </button>
-          )}
-
-          {!isLoading && currentUser && (
+          {currentUser ? (
             <div className="flex items-center justify-between px-4 py-3 bg-[#F9F8F6] border border-structural">
-              <span className="text-[9px] font-bold uppercase tracking-widest text-[#8A9A5B]">Cloud Sync Active</span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#8A9A5B]">Cloud Sync Active</span>
+                {isLoading && <span className="text-[7px] text-gray-400 uppercase animate-pulse">Updating...</span>}
+              </div>
               <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-all flex items-center gap-2" title="Sign Out">
                 <LogOut size={12} />
               </button>
             </div>
+          ) : (
+            <>
+              {isLoading ? (
+                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-structural border-dashed animate-pulse">
+                  <div className="w-3 h-3 rounded-full bg-[#8A9A5B]/30 animate-ping" />
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Connecting...</span>
+                </div>
+              ) : (
+                <button 
+                  onClick={signInWithGoogle}
+                  className="flex items-center gap-3 px-4 py-3 bg-[#f2f2f2] text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest border border-dashed border-gray-300 hover:border-[#8A9A5B] transition-all"
+                >
+                  <LogIn size={14} className="text-[#8A9A5B]" /> Login for Cloud Sync
+                </button>
+              )}
+            </>
           )}
 
           <div className="flex flex-col gap-5">
@@ -131,28 +134,33 @@ const App: React.FC = () => {
           <span className="font-editorial italic text-xs text-[#8A9A5B]">for Quynh Anh</span>
         </div>
         <div className="flex gap-2 items-center">
-          {isLoading && (
-            <div className="p-2 animate-pulse text-gray-300">
-              <LogIn size={18} />
-            </div>
-          )}
-          {!isLoading && !currentUser && (
-            <button 
-              onClick={signInWithGoogle}
-              className="p-2 border-structural text-[#8A9A5B] hover:bg-gray-50 transition-all"
-              title="Login"
-            >
-              <LogIn size={18} />
-            </button>
-          )}
-          {!isLoading && currentUser && (
+          {currentUser ? (
             <button 
               onClick={signOut}
-              className="p-2 border-structural text-red-400 active:scale-90 transition-transform"
+              className={clsx(
+                "p-2 border-structural text-red-400 active:scale-90 transition-transform",
+                isLoading && "animate-pulse"
+              )}
               title="Logout"
             >
               <LogOut size={18} />
             </button>
+          ) : (
+            <>
+              {isLoading ? (
+                <div className="p-2 animate-pulse text-gray-300">
+                  <LogIn size={18} />
+                </div>
+              ) : (
+                <button 
+                  onClick={signInWithGoogle}
+                  className="p-2 border-structural text-[#8A9A5B] hover:bg-gray-50 transition-all"
+                  title="Login"
+                >
+                  <LogIn size={18} />
+                </button>
+              )}
+            </>
           )}
           <button onClick={() => setIsDiaryOpen(true)} className="p-2 border-structural"><PenLine size={18} /></button>
           <button onClick={() => setIsAddPanelOpen(true)} className="bg-[#1A1A1A] text-white p-2 border-structural"><Plus size={18} /></button>

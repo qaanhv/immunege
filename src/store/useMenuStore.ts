@@ -263,12 +263,12 @@ export const useMenuStore = create<MenuState>()(
         set({ isLoading: true });
         try {
           const provider = new GoogleAuthProvider();
-          // Force account selection to avoid "flash" closure in some browsers
           provider.setCustomParameters({ prompt: 'select_account' });
           await signInWithPopup(auth, provider);
           get().showNotification("Logged in successfully!", "success");
         } catch (error: any) {
           console.error("Auth Error:", error);
+          set({ isLoading: false });
           get().showNotification(`Login failed: ${error.message}`, "info");
         }
       },
@@ -285,9 +285,13 @@ export const useMenuStore = create<MenuState>()(
 
       syncWithFirebase: async () => {
         const user = get().currentUser;
-        if (!user) return;
+        if (!user) {
+          console.warn("Sync skipped: No user logged in");
+          return;
+        }
         const state = get();
         try {
+          console.log(`Syncing to Cloud for user ${user.uid}...`, { dishes: state.dishes.length });
           await setDoc(doc(db, 'users', user.uid), {
             dishes: state.dishes,
             flaggedIngredients: state.flaggedIngredients,
@@ -296,10 +300,10 @@ export const useMenuStore = create<MenuState>()(
             diaryEntries: state.diaryEntries,
             flagIncidents: state.flagIncidents,
             updatedAt: new Date().toISOString()
-          });
-          console.log("Cloud Sync Successful");
+          }, { merge: true });
+          console.log("Cloud Sync: [SUCCESS]");
         } catch (error) {
-          console.error("Cloud Sync Error:", error);
+          console.error("Cloud Sync: [FAILED]", error);
         }
       }
     }),
@@ -331,23 +335,28 @@ auth.onAuthStateChanged((user) => {
     
     // Switch to onSnapshot for real-time sync
     unsubscribe = onSnapshot(docRef, (docSnap) => {
-      // Don't update local state if the change was made by this client (prevents loops)
-      if (docSnap.metadata.hasPendingWrites) return;
+      const data = docSnap.data();
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        useMenuStore.setState({ 
-          currentUser: user,
-          dishes: data.dishes || [],
-          flaggedIngredients: data.flaggedIngredients || [],
-          plannedMeals: data.plannedMeals || [],
-          groceryItems: data.groceryItems || [],
-          diaryEntries: data.diaryEntries || [],
-          flagIncidents: data.flagIncidents || [],
-          isLoading: false
-        });
-        console.log("Real-time Sync: Data updated from cloud");
+      if (docSnap.exists() && data) {
+        // Only update local state if it's not a change we just made ourselves
+        if (!docSnap.metadata.hasPendingWrites) {
+          useMenuStore.setState({ 
+            currentUser: user,
+            dishes: data.dishes || [],
+            flaggedIngredients: data.flaggedIngredients || [],
+            plannedMeals: data.plannedMeals || [],
+            groceryItems: data.groceryItems || [],
+            diaryEntries: data.diaryEntries || [],
+            flagIncidents: data.flagIncidents || [],
+            isLoading: false
+          });
+          console.log("Cloud Data Synced");
+        } else {
+          // If it IS our own write, we still need to stop the loading spinner
+          useMenuStore.setState({ currentUser: user, isLoading: false });
+        }
       } else {
+        // Document doesn't exist yet, but we are authenticated
         useMenuStore.setState({ currentUser: user, isLoading: false });
       }
     }, (error) => {
@@ -361,7 +370,10 @@ auth.onAuthStateChanged((user) => {
 
 // Middleware to auto-sync to Firebase on changes
 useMenuStore.subscribe((state, prevState) => {
-  if (state.currentUser) {
+  // CRITICAL: Only sync if we are NOT in a loading state. 
+  // This prevents the "Local Storage" (which might be old) from overwriting 
+  // the "Cloud Storage" before the initial download is complete.
+  if (state.currentUser && !state.isLoading) {
     const hasChanged = 
       JSON.stringify(state.dishes) !== JSON.stringify(prevState.dishes) ||
       JSON.stringify(state.flaggedIngredients) !== JSON.stringify(prevState.flaggedIngredients) ||
