@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dish, useMenuStore, MealType } from '../store/useMenuStore';
 import { IngredientTag } from './IngredientTag';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, Edit3, Save, CalendarPlus, Plus, AlertOctagon, ShieldAlert } from 'lucide-react';
+import { X, Trash2, Edit3, Save, CalendarPlus, Plus, AlertOctagon, ShieldAlert, Sparkles, Wand2, Loader2, Image as ImageIcon } from 'lucide-react';
 import clsx from 'clsx';
 
 interface DishDetailPanelProps {
@@ -23,6 +23,8 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
   const [editName, setEditName] = useState('');
   const [editMealType, setEditMealType] = useState<MealType>('Lunch');
   const [editIngredients, setEditIngredients] = useState('');
+  const [editImageUrl, setEditImageUrl] = useState('');
+  const [isImageGenerating, setIsImageGenerating] = useState(false);
   
   const [isPlanningOpen, setIsPlanningOpen] = useState(false);
   const [planDate, setPlanDate] = useState(new Date().toISOString().split('T')[0]);
@@ -40,6 +42,7 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
       setEditName(dish.name);
       setEditMealType(dish.mealType);
       setEditIngredients(dish.ingredients.join(', '));
+      setEditImageUrl(dish.imageUrl);
       setIsEditing(false);
       setIsPlanningOpen(false);
       setShowDeleteConfirm(false);
@@ -50,14 +53,38 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
   if (!dish) return null;
 
   const dishHasFlagged = dish.ingredients.some(ing => flaggedIngredients.includes(ing));
-
   const handleSave = () => {
     updateDish(dish.id, {
       name: editName,
       mealType: editMealType,
-      ingredients: editIngredients.split(',').map(i => i.trim()).filter(Boolean)
+      ingredients: editIngredients.split(',').map(i => i.trim()).filter(Boolean),
+      imageUrl: editImageUrl
     });
     setIsEditing(false);
+  };
+
+  const handleGenerateImage = () => {
+    if (!editName) return;
+    setIsImageGenerating(true);
+    setTimeout(() => {
+      const n = editName.toLowerCase();
+      let path = '';
+      
+      if (n.includes('phở') || n.includes('pho')) path = '/assets/pho_bo.png';
+      else if (n.includes('bún chả') || n.includes('bun cha')) path = '/assets/bun_cha.png';
+      else if (n.includes('bánh mì') || n.includes('banh mi')) path = '/assets/banh_mi.png';
+      else if (n.includes('cơm tấm') || n.includes('com tam')) path = '/assets/com_tam.png';
+      else if (n.includes('bún bò') || n.includes('bun bo')) path = '/assets/bun_bo_hue.png';
+      else if (n.includes('bánh xèo') || n.includes('banh xeo')) path = '/assets/banh_xeo.png';
+      else if (n.includes('cao lầu') || n.includes('cao lau')) path = '/assets/cao_lau.png';
+      else if (n.includes('gỏi cuốn') || n.includes('goi cuon') || n.includes('spring roll')) path = '/assets/goi_cuon.png';
+      else {
+        path = `https://loremflickr.com/800/600/vietnamese,food,cooking,${encodeURIComponent(editName)}/all`;
+      }
+
+      setEditImageUrl(path);
+      setIsImageGenerating(false);
+    }, 1200);
   };
 
   const handleDelete = () => {
@@ -127,8 +154,20 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
 
             <div className="flex-1 overflow-y-auto">
               {/* Image Section */}
-              <div className="w-full aspect-video md:aspect-[21/9] overflow-hidden border-structural-b bg-gray-100">
-                <img src={dish.imageUrl} alt={dish.name} className="w-full h-full object-cover" />
+              <div className="w-full aspect-video md:aspect-[21/9] overflow-hidden border-structural-b bg-gray-100 relative group">
+                <img src={isEditing ? editImageUrl : dish.imageUrl} alt={dish.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                {isEditing && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
+                    <button 
+                      onClick={handleGenerateImage}
+                      disabled={isImageGenerating}
+                      className="bg-white/90 hover:bg-white text-[#1A1A1A] px-4 py-2 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl border border-structural disabled:opacity-50"
+                    >
+                      {isImageGenerating ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} className="text-[#8A9A5B]" />}
+                      {isImageGenerating ? 'Generating...' : 'Regenerate with AI'}
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="p-8 flex flex-col gap-10 text-[#1A1A1A]">
@@ -175,11 +214,25 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
+                      <label className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Imagery Source (URL)</label>
+                      <div className="relative">
+                        <ImageIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input 
+                          type="text"
+                          value={editImageUrl}
+                          onChange={e => setEditImageUrl(e.target.value)}
+                          placeholder="Paste image URL here..."
+                          className="w-full pl-9 pr-3 py-2 bg-transparent border-structural text-[10px] font-bold uppercase tracking-widest outline-none focus:border-[#8A9A5B] transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
                       <label className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Ingredients (Comma separated)</label>
                       <textarea 
                         value={editIngredients}
                         onChange={e => setEditIngredients(e.target.value)}
-                        className="w-full h-32 p-3 bg-transparent border-structural text-sm outline-none focus:border-[#8A9A5B] resize-none"
+                        className="w-full h-24 p-3 bg-transparent border-structural text-sm outline-none focus:border-[#8A9A5B] resize-none"
                       />
                     </div>
                   </div>
