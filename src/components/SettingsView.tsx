@@ -85,17 +85,38 @@ export const SettingsView: React.FC = () => {
         {/* Data Persistence Info */}
         <section className="flex flex-col gap-6">
           <div className="p-6 bg-white border-structural shadow-sm">
-            <div className="flex items-center gap-3 mb-4 text-[#8A9A5B]">
-              <Database size={20} />
-              <h3 className="font-bold uppercase tracking-widest text-xs">Local Storage</h3>
-            </div>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">
-              Your data is currently saved **locally in your browser**. It stays here even if you refresh or close the app.
-            </p>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-[#8A9A5B] uppercase">
-              <ShieldCheck size={14} /> 
-              Private & Secure
-            </div>
+            {store.currentUser ? (
+              <>
+                <div className="flex items-center gap-3 mb-4 text-[#8A9A5B]">
+                  <Database size={20} />
+                  <h3 className="font-bold uppercase tracking-widest text-xs">Cloud Sync Active</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  Your data is safely synced to the **Cloud**. Your computer and phone will stay perfectly in step.
+                </p>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-[#8A9A5B] uppercase">
+                  <ShieldCheck size={14} /> 
+                  Synced as {store.currentUser.displayName}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-4 text-gray-400">
+                  <Database size={20} />
+                  <h3 className="font-bold uppercase tracking-widest text-xs">Local Storage</h3>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  Your data is currently saved **locally**. Login to sync across your computer and phone.
+                </p>
+                <button 
+                  onClick={store.signInWithGoogle}
+                  className="flex items-center gap-2 text-[10px] font-bold text-[#8A9A5B] uppercase hover:underline"
+                >
+                  <Database size={14} /> 
+                  Enable Cloud Sync
+                </button>
+              </>
+            )}
           </div>
 
           <div className="p-6 border border-structural border-dashed">
