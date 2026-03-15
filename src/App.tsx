@@ -67,22 +67,36 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {currentUser ? (
-            <div className="flex items-center justify-between px-4 py-3 bg-[#F9F8F6] border border-structural">
-              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-[#8A9A5B]">Cloud Sync Active</span>
-                {isLoading && <span className="text-[7px] text-gray-400 uppercase animate-pulse">Updating...</span>}
+          {currentUser && (
+            <div className="flex flex-col gap-3 px-4 py-3 bg-[#F9F8F6] border border-structural">
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className={clsx(
+                      "w-1.5 h-1.5 rounded-full shadow-sm",
+                      isLoading ? "bg-amber-400" : "bg-[#8A9A5B]",
+                      useMenuStore.getState().isSyncing && "animate-pulse"
+                    )} />
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-[#1A1A1A]">Cloud Linked</span>
+                  </div>
+                  {useMenuStore.getState().lastSyncedAt && (
+                    <span className="text-[7px] text-gray-400 uppercase tracking-tighter">Synced {useMenuStore.getState().lastSyncedAt}</span>
+                  )}
+                  {isLoading && <span className="text-[7px] text-amber-500 uppercase font-black animate-pulse">Initializing...</span>}
+                </div>
+                <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-all" title="Sign Out">
+                  <LogOut size={12} />
+                </button>
               </div>
-              <button onClick={signOut} className="text-gray-400 hover:text-red-500 transition-all flex items-center gap-2" title="Sign Out">
-                <LogOut size={12} />
-              </button>
             </div>
-          ) : (
-            <>
+          )}
+          
+          {!currentUser && (
+            <div className="flex flex-col gap-3">
               {isLoading ? (
                 <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 border border-structural border-dashed animate-pulse">
-                  <div className="w-3 h-3 rounded-full bg-[#8A9A5B]/30 animate-ping" />
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Connecting...</span>
+                  <div className="w-3 h-3 rounded-full bg-gray-200 animate-ping" />
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Searching Account...</span>
                 </div>
               ) : (
                 <button 
@@ -92,7 +106,7 @@ const App: React.FC = () => {
                   <LogIn size={14} className="text-[#8A9A5B]" /> Login for Cloud Sync
                 </button>
               )}
-            </>
+            </div>
           )}
 
           <div className="flex flex-col gap-5">
@@ -135,16 +149,21 @@ const App: React.FC = () => {
         </div>
         <div className="flex gap-2 items-center">
           {currentUser ? (
-            <button 
-              onClick={signOut}
-              className={clsx(
-                "p-2 border-structural text-red-400 active:scale-90 transition-transform",
-                isLoading && "animate-pulse"
+            <div className="flex items-center gap-2">
+              {useMenuStore.getState().isSyncing && (
+                <div className="w-1.5 h-1.5 rounded-full bg-[#8A9A5B] animate-pulse" />
               )}
-              title="Logout"
-            >
-              <LogOut size={18} />
-            </button>
+              <button 
+                onClick={signOut}
+                className={clsx(
+                  "p-2 border-structural text-red-400 active:scale-90 transition-transform",
+                  isLoading && "animate-pulse"
+                )}
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
           ) : (
             <>
               {isLoading ? (
@@ -236,10 +255,13 @@ const App: React.FC = () => {
               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
               className={clsx(
                 "pointer-events-auto flex items-center gap-3 px-5 py-3 shadow-2xl border font-bold uppercase tracking-widest text-[10px]",
-                n.type === 'success' ? "bg-[#1A1A1A] text-white border-structural" : "bg-white text-[#1A1A1A] border-structural"
+                n.type === 'success' && "bg-[#1A1A1A] text-white border-structural",
+                n.type === 'info' && "bg-white text-[#1A1A1A] border-structural",
+                n.type === 'error' && "bg-red-50 text-red-600 border-red-200"
               )}
             >
               {n.type === 'success' && <Check size={14} className="text-[#8A9A5B]" />}
+              {n.type === 'error' && <ShieldAlert size={14} className="text-red-500" />}
               {n.message}
               <button 
                 onClick={() => removeNotification(n.id)}

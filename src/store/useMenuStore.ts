@@ -53,7 +53,7 @@ export interface FlagIncident {
 export interface Notification {
   id: string;
   message: string;
-  type: 'success' | 'info';
+  type: 'success' | 'info' | 'error';
 }
 
 export interface MenuState {
@@ -65,7 +65,7 @@ export interface MenuState {
   flagIncidents: FlagIncident[];
   notifications: Notification[];
   
-  showNotification: (message: string, type?: 'success' | 'info') => void;
+  showNotification: (message: string, type?: 'success' | 'info' | 'error') => void;
   removeNotification: (id: string) => void;
   
   addDish: (dish: Dish) => void;
@@ -96,6 +96,8 @@ export interface MenuState {
 
   currentUser: any | null;
   isLoading: boolean;
+  isSyncing: boolean;
+  lastSyncedAt: string | null;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   syncWithFirebase: () => Promise<void>;
@@ -148,6 +150,8 @@ export const useMenuStore = create<MenuState>()(
       notifications: [],
       currentUser: null,
       isLoading: true,
+      isSyncing: false,
+      lastSyncedAt: null,
 
       showNotification: (message, type = 'success') => {
         const id = Math.random().toString(36).substring(7);
@@ -301,9 +305,12 @@ export const useMenuStore = create<MenuState>()(
             flagIncidents: state.flagIncidents,
             updatedAt: new Date().toISOString()
           }, { merge: true });
+          set({ isSyncing: false, lastSyncedAt: new Date().toLocaleTimeString() });
           console.log("Cloud Sync: [SUCCESS]");
-        } catch (error) {
+        } catch (error: any) {
           console.error("Cloud Sync: [FAILED]", error);
+          set({ isSyncing: false });
+          get().showNotification(`Cloud Sync Failed: ${error.message}`, "error");
         }
       }
     }),

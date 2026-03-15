@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useMenuStore } from '../store/useMenuStore';
 import { Download, Upload, Trash2, Database, ShieldCheck, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
 export const SettingsView: React.FC = () => {
   const store = useMenuStore();
@@ -103,10 +104,26 @@ export const SettingsView: React.FC = () => {
                 <p className="text-sm text-gray-600 leading-relaxed mb-4">
                   Your data is safely synced to the **Cloud**. Your computer and phone will stay perfectly in step.
                 </p>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-[#8A9A5B] uppercase">
+                <div className="flex items-center gap-2 text-[10px] font-bold text-[#8A9A5B] uppercase mb-4">
                   <ShieldCheck size={14} /> 
                   Synced as {store.currentUser.displayName}
                 </div>
+                {store.lastSyncedAt && (
+                   <div className="text-[10px] text-gray-400 uppercase mb-4">
+                     Last Connection: {store.lastSyncedAt}
+                   </div>
+                )}
+                <button 
+                  onClick={() => store.syncWithFirebase()}
+                  disabled={store.isSyncing}
+                  className={clsx(
+                    "flex items-center gap-2 px-4 py-2 bg-gray-50 border border-structural text-[9px] font-bold uppercase tracking-widest hover:bg-white transition-all",
+                    store.isSyncing && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <Database size={12} className={clsx(store.isSyncing && "animate-spin")} />
+                  {store.isSyncing ? "Syncing..." : "Force Sync Now"}
+                </button>
               </>
             ) : (
               <>
