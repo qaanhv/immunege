@@ -123,9 +123,25 @@ const App: React.FC = () => {
           <h1 className="font-editorial text-2xl leading-none">IMMUNEGE</h1>
           <span className="font-editorial italic text-xs text-[#8A9A5B]">for Quynh Anh</span>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setIsDiaryOpen(true)} className="p-2 border-structural"><PenLine size={16} /></button>
-          <button onClick={() => setIsAddPanelOpen(true)} className="bg-[#1A1A1A] text-white p-2 border-structural"><Plus size={16} /></button>
+        <div className="flex gap-2 items-center">
+          {!currentUser ? (
+            <button 
+              onClick={signInWithGoogle}
+              className="p-2 border-structural text-[#8A9A5B] hover:bg-gray-50 transition-all"
+              title="Login"
+            >
+              <LogIn size={18} />
+            </button>
+          ) : (
+            <button 
+              onClick={signOut}
+              className="w-8 h-8 rounded-full overflow-hidden border border-[#8A9A5B] active:scale-90 transition-transform"
+            >
+              <img src={currentUser.photoURL} alt="user" className="w-full h-full object-cover" />
+            </button>
+          )}
+          <button onClick={() => setIsDiaryOpen(true)} className="p-2 border-structural"><PenLine size={18} /></button>
+          <button onClick={() => setIsAddPanelOpen(true)} className="bg-[#1A1A1A] text-white p-2 border-structural"><Plus size={18} /></button>
         </div>
       </div>
 
