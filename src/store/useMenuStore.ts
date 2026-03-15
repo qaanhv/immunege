@@ -96,6 +96,7 @@ export interface MenuState {
 
   currentUser: any | null;
   isLoading: boolean;
+  isCloudInitialized: boolean;
   isSyncing: boolean;
   lastSyncedAt: string | null;
   signInWithGoogle: () => Promise<void>;
@@ -151,6 +152,7 @@ export const useMenuStore = create<MenuState>()(
       notifications: [],
       currentUser: null,
       isLoading: true,
+      isCloudInitialized: false,
       isSyncing: false,
       lastSyncedAt: null,
 
@@ -333,13 +335,16 @@ export const useMenuStore = create<MenuState>()(
   )
 );
 
+// Global flag to prevent sync loops
+let isRemoteUpdate = false;
+
 // Auth Listener & Real-time Sync
 let unsubscribe: (() => void) | null = null;
 let loadingTimeout: ReturnType<typeof setTimeout> | null = null;
 
-// MASTER SAFETY TIMEOUT:
-// Clear loading state after 5 seconds no matter what, 
-// so the user can at least use local data.
+// Note: We DO NOT set isCloudInitialized here. 
+// We only want the user to be able to interact, 
+// but we still wait for cloud before allowing an upload.
 setTimeout(() => {
   const state = useMenuStore.getState();
   if (state.isLoading) {
@@ -384,6 +389,7 @@ auth.onAuthStateChanged((user) => {
       // or if Firestore already knows about our pending writes,
       // DO NOT let the incoming cloud snapshot overwrite our local state.
       if (docSnap.exists() && data && !state.isSyncing && !docSnap.metadata.hasPendingWrites) {
+          isRemoteUpdate = true;
           useMenuStore.setState({ 
             currentUser: user,
             dishes: data.dishes || [],
@@ -393,13 +399,21 @@ auth.onAuthStateChanged((user) => {
             diaryEntries: data.diaryEntries || [],
             flagIncidents: data.flagIncidents || [],
             isLoading: false,
+            isCloudInitialized: true,
             lastSyncedAt: new Date().toLocaleTimeString() 
           });
-          console.log("✅ Cloud Sync: Local State Updated from Cloud");
+          isRemoteUpdate = false;
+          console.log("✅ Cloud Sync: Incoming data applied.");
           if (loadingTimeout) clearTimeout(loadingTimeout);
       } else {
-        // Just ensure we aren't stuck in a loading state
-        if (state.isLoading) useMenuStore.setState({ isLoading: false });
+        // Document doesn't exist yet (new user) or we made the change
+        if (!docSnap.exists()) {
+          console.log("ℹ️ No cloud document found. Initializing as new user.");
+          useMenuStore.setState({ isCloudInitialized: true, isLoading: false });
+        } else {
+          useMenuStore.setState({ isLoading: false });
+        }
+        if (loadingTimeout) clearTimeout(loadingTimeout);
       }
     }, (error) => {
       console.error("❌ Snapshot Error:", error);
@@ -415,10 +429,11 @@ auth.onAuthStateChanged((user) => {
 
 // Middleware to auto-sync to Firebase on changes
 useMenuStore.subscribe((state, prevState) => {
-  // CRITICAL: Only sync if we are NOT in a loading state. 
-  // This prevents the "Local Storage" (which might be old) from overwriting 
-  // the "Cloud Storage" before the initial download is complete.
-  if (state.currentUser && !state.isLoading) {
+  // CRITICAL PROTECTION:
+  // 1. Only sync if we have a user.
+  // 2. Only sync if we have finished our first download (isCloudInitialized).
+  // 3. Only sync if the change was NOT caused by an incoming cloud update (isRemoteUpdate).
+  if (state.currentUser && state.isCloudInitialized && !isRemoteUpdate) {
     const hasChanged = 
       JSON.stringify(state.dishes) !== JSON.stringify(prevState.dishes) ||
       JSON.stringify(state.flaggedIngredients) !== JSON.stringify(prevState.flaggedIngredients) ||
