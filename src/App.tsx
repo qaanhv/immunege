@@ -62,7 +62,7 @@ const App: React.FC = () => {
       <nav className="hidden md:flex w-64 h-screen sticky top-0 bg-white border-structural-r p-8 flex-col justify-between z-30 shadow-sm">
         <div className="flex flex-col gap-10">
           <div className="flex flex-col gap-1">
-            <h1 className="font-editorial text-4xl leading-none tracking-tight">IMMUNEGE</h1>
+            <h1 className="font-editorial text-4xl leading-none tracking-tight">BEPBABE</h1>
             <div className="flex items-center gap-2 mt-1">
               <span className="font-editorial italic text-lg text-[#8A9A5B] leading-none">for Quynh Anh</span>
               <button onClick={() => setIsDiaryOpen(true)} className="text-gray-300 hover:text-[#1A1A1A] transition-colors"><PenLine size={12} /></button>
@@ -156,7 +156,7 @@ const App: React.FC = () => {
       {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-6 bg-white border-structural-b sticky top-0 z-40">
         <div className="flex flex-col">
-          <h1 className="font-editorial text-2xl leading-none">IMMUNEGE</h1>
+          <h1 className="font-editorial text-2xl leading-none">BEPBABE</h1>
           <span className="font-editorial italic text-xs text-[#8A9A5B]">for Quynh Anh</span>
         </div>
         <div className="flex gap-2 items-center">

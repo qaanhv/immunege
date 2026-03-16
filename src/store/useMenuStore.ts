@@ -137,6 +137,38 @@ const initialDishes: Dish[] = [
     imageUrl: '/assets/com_tam.png',
     ingredients: ['Cơm tấm', 'Sườn nướng', 'Bì thính', 'Chả trứng', 'Đồ chua'],
     customTags: ['filling', 'traditional']
+  },
+  {
+    id: '5',
+    name: 'Bánh Xèo Giòn Rụm',
+    mealType: 'Lunch',
+    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/banh_xeo_generated_1773501550991.png',
+    ingredients: ['Bột gạo', 'Tôm', 'Thịt heo', 'Giá đỗ', 'Rau sống', 'Nước mắm chua ngọt'],
+    customTags: ['crispy', 'savory']
+  },
+  {
+    id: '6',
+    name: 'Bún Bò Huế Cay Nồng',
+    mealType: 'Morning',
+    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/bun_bo_hue_generated_1773501568493.png',
+    ingredients: ['Bún to', 'Bắp bò', 'Giò heo', 'Nước dùng mắm ruốc', 'Sả', 'Ớt màu'],
+    customTags: ['spicy', 'soup']
+  },
+  {
+    id: '7',
+    name: 'Cao Lầu Hội An',
+    mealType: 'Lunch',
+    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/cao_lau_generated_1773501586593.png',
+    ingredients: ['Mì cao lầu', 'Xá xíu', 'Ram giòn', 'Rau Trà Quế', 'Nước xốt đậm đà'],
+    customTags: ['specialty', 'central']
+  },
+  {
+    id: '8',
+    name: 'Gỏi Cuốn Tôm Thịt',
+    mealType: 'Snack',
+    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/goi_cuon_generated_1773495526012.png',
+    ingredients: ['Bánh tráng', 'Tôm', 'Thịt luộc', 'Bún', 'Hẹ', 'Tương đen'],
+    customTags: ['fresh', 'healthy']
   }
 ];
 
@@ -322,7 +354,7 @@ export const useMenuStore = create<MenuState>()(
       }
     }),
     {
-      name: 'immunege-ledger-storage',
+      name: 'bepbabe-ledger-storage',
       partialize: (state) => ({ 
         dishes: state.dishes,
         flaggedIngredients: state.flaggedIngredients,

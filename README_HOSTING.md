@@ -1,4 +1,4 @@
-# How to Save and Host your Immunege Ledger 🍲
+# How to Save and Host your BepBabe Ledger 🍲
 
 Since you intend to use this long-term, here is everything you need to know about your data and how to access the app anywhere.
 
@@ -24,9 +24,9 @@ To access this anywhere without needing to run code on your computer, you can "H
 3. **Connect to Vercel**:
    - Go to [Vercel.com](https://vercel.com) and log in with GitHub.
    - Click "Add New" -> "Project".
-   - Select your `immunege` repository.
+   - Select your `bepbabe` repository.
    - Click **Deploy**.
-4. **Result**: You will get a link like `https://immunege-yourname.vercel.app` that you can open on your phone or any device!
+4. **Result**: You will get a link like `https://bepbabe-yourname.vercel.app` that you can open on your phone or any device!
 
 **Note**: Even on Vercel, the data stays in the browser of the device you are using. For a "lifetime" record, the **Export/Import** feature is your best friend until we set up a permanent online database (like Supabase).
 
