@@ -107,68 +107,148 @@ export interface MenuState {
 
 const initialDishes: Dish[] = [
   {
-    id: '1',
-    name: 'Phở Bò MáiTơ',
-    mealType: 'Morning',
-    imageUrl: '/assets/pho_bo.png',
-    ingredients: ['Bánh phở', 'Thịt bò', 'Nước dùng lâu năm', 'Hành lá', 'Rau mùi'],
-    customTags: ['soup', 'classic']
+    id: "1",
+    name: "Phở Bò ",
+    mealType: "Morning",
+    imageUrl: "https://cdn.eva.vn/upload/3-2023/images/2023-07-13/cach-nau-pho-bo-ha-noi-thom-ngon-chuan-vi-tai-nha-cuc-don-gian-14-1689214964-384-width700height482.jpg",
+    ingredients: ["Bánh phở", "Thịt bò", "Hành lá", "Rau mùi"],
+    customTags: ["soup", "classic"]
   },
   {
-    id: '2',
-    name: 'Bún Chả Hà Nội',
-    mealType: 'Lunch',
-    imageUrl: '/assets/bun_cha.png',
-    ingredients: ['Bún', 'Thịt nướng', 'Nước chấm chua ngọt', 'Đu đủ xanh', 'Hành phi'],
-    customTags: ['grilled', 'specialty']
+    id: "2",
+    name: "Bún Chả Hà Nội",
+    mealType: "Morning",
+    imageUrl: "https://i-giadinh.vnecdn.net/2023/04/16/Buoc-11-Thanh-pham-11-7068-1681636164.jpg",
+    ingredients: ["Bún", "Thịt nướng", "Nước chấm chua ngọt", "Đu đủ xanh", "Hành phi"],
+    customTags: ["grilled", "specialty"]
   },
   {
-    id: '3',
-    name: 'Bánh Mì Sài Gòn',
-    mealType: 'Morning',
-    imageUrl: '/assets/banh_mi.png',
-    ingredients: ['Bánh mì giòn', 'Patê gan', 'Bơ trứng', 'Chả lụa', 'Dưa leo'],
-    customTags: ['crispy', 'popular']
+    id: "3",
+    name: "Bánh Mì",
+    mealType: "Morning",
+    imageUrl: "/assets/banh_mi.png",
+    ingredients: ["Bánh mì giòn", "Patê gan", "Bơ trứng", "Chả lụa", "Dưa leo"],
+    customTags: ["crispy", "popular"]
   },
   {
-    id: '4',
-    name: 'Cơm Tấm Sườn Bì',
-    mealType: 'Lunch',
-    imageUrl: '/assets/com_tam.png',
-    ingredients: ['Cơm tấm', 'Sườn nướng', 'Bì thính', 'Chả trứng', 'Đồ chua'],
-    customTags: ['filling', 'traditional']
+    id: "4",
+    name: "Cơm Tấm Sườn Bì",
+    mealType: "Lunch",
+    imageUrl: "https://static.vinwonders.com/production/com-tam-sai-gon-2.jpg",
+    ingredients: ["Cơm tấm", "Sườn nướng", "Bì thính", "Chả trứng", "Đồ chua"],
+    customTags: ["filling", "traditional"]
   },
   {
-    id: '5',
-    name: 'Bánh Xèo Giòn Rụm',
-    mealType: 'Lunch',
-    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/banh_xeo_generated_1773501550991.png',
-    ingredients: ['Bột gạo', 'Tôm', 'Thịt heo', 'Giá đỗ', 'Rau sống', 'Nước mắm chua ngọt'],
-    customTags: ['crispy', 'savory']
+    id: "5",
+    name: "Bánh Xèo",
+    mealType: "Lunch",
+    imageUrl: "https://vcdn1-dulich.vnecdn.net/2026/03/06/banhxeo1-1772781174-1772781196-6610-1772787154.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=fsGN9U4BVbo4GmLZ4FPOBA",
+    ingredients: ["Bột gạo", "Tôm", "Thịt heo", "Giá đỗ", "Rau sống", "Nước mắm chua ngọt"],
+    customTags: ["crispy", "savory"]
   },
   {
-    id: '6',
-    name: 'Bún Bò Huế Cay Nồng',
-    mealType: 'Morning',
-    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/bun_bo_hue_generated_1773501568493.png',
-    ingredients: ['Bún to', 'Bắp bò', 'Giò heo', 'Nước dùng mắm ruốc', 'Sả', 'Ớt màu'],
-    customTags: ['spicy', 'soup']
+    id: "6",
+    name: "Bún Bò Huế",
+    mealType: "Morning",
+    imageUrl: "https://spirit.vietnamairlines.com/wp-content/uploads/2024/04/nau-bun-bo-hue-chuan-vi-tai-nha-voi-cot-co-dac-quoc-viet-foods_59b7ba1543004e67967af718d8afc32b.webp",
+    ingredients: ["Bún to", "Bắp bò", "Giò heo", "Nước dùng mắm ruốc", "Sả", "Ớt màu"],
+    customTags: ["spicy", "soup"]
   },
   {
-    id: '7',
-    name: 'Cao Lầu Hội An',
-    mealType: 'Lunch',
-    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/cao_lau_generated_1773501586593.png',
-    ingredients: ['Mì cao lầu', 'Xá xíu', 'Ram giòn', 'Rau Trà Quế', 'Nước xốt đậm đà'],
-    customTags: ['specialty', 'central']
+    id: "7",
+    name: "Gỏi Xoài Tôm Thịt",
+    mealType: "Snack",
+    imageUrl: "https://i-giadinh.vnecdn.net/2021/10/02/nomxoaixanh-1633166804-6598-1633166810.jpg",
+    ingredients: [],
+    customTags: ["specialty", "central"]
   },
   {
-    id: '8',
-    name: 'Gỏi Cuốn Tôm Thịt',
-    mealType: 'Snack',
-    imageUrl: 'C:/Users/DELL/.gemini/antigravity/brain/5ddb1a8c-dd76-4345-b1b2-b07af796c69d/goi_cuon_generated_1773495526012.png',
-    ingredients: ['Bánh tráng', 'Tôm', 'Thịt luộc', 'Bún', 'Hẹ', 'Tương đen'],
-    customTags: ['fresh', 'healthy']
+    id: "8",
+    name: "Bánh Cuốn Nóng",
+    mealType: "Snack",
+    imageUrl: "https://img-global.cpcdn.com/recipes/b235f5db0142062d/1200x630cq80/photo.jpg",
+    ingredients: [],
+    customTags: ["fresh", "healthy"]
+  },
+  {
+    id: "qzh9d2",
+    name: "Bánh Da Heo",
+    mealType: "Snack",
+    imageUrl: "https://i.ytimg.com/vi/HSM5DxcxjkA/maxresdefault.jpg",
+    ingredients: [],
+    customTags: ["dessert"]
+  },
+  {
+    id: "wxq0fl",
+    name: "Bún Thịt Nướng",
+    mealType: "Lunch",
+    imageUrl: "https://cdn.tgdd.vn/Files/2021/08/11/1374456/cach-lam-bun-tron-thit-nuong-thom-ngon-hap-dan-tai-nha-202201051116113726.jpg",
+    ingredients: [],
+    customTags: []
+  },
+  {
+    id: "gbrctq",
+    name: "Chả Ram",
+    mealType: "Lunch",
+    imageUrl: "https://dogifood.vn/Images/news/2107301131-cha-gio.webp",
+    ingredients: [],
+    customTags: []
+  },
+  {
+    id: "ig18t",
+    name: "Gỏi Cuốn",
+    mealType: "Lunch",
+    imageUrl: "https://www.vimishop-vnfoods.com/cdn/shop/articles/240627_1200x1200.jpg?v=1720164521",
+    ingredients: [],
+    customTags: []
+  },
+  {
+    id: "0x5i95",
+    name: "Tiramisu",
+    mealType: "Lunch",
+    imageUrl: "https://vcdn1-dulich.vnecdn.net/2016/08/23/banhngon2-1471922491.jpg?w=460&h=0&q=100&dpr=2&fit=crop&s=JLN0JUIPBwClQeiatvJWQQ",
+    ingredients: [],
+    customTags: ["dessert"]
+  },
+  {
+    id: "pw4g8s",
+    name: "Hot Chocolate",
+    mealType: "Morning",
+    imageUrl: "https://foodbyjonister.com/wp-content/uploads/2020/11/DirtyHotChocolate3-892x1300.jpg",
+    ingredients: [],
+    customTags: ["Drink"]
+  },
+  {
+    id: "rmk5zb",
+    name: "Bánh Bèo",
+    mealType: "Lunch",
+    imageUrl: "https://cdn.tgdd.vn/Files/2017/03/21/963426/cach-lam-banh-beo-thom-ngon-202110041645542724.jpg",
+    ingredients: [],
+    customTags: []
+  },
+  {
+    id: "mxfuqd",
+    name: "Bánh Nậm",
+    mealType: "Lunch",
+    imageUrl: "https://statics.vinpearl.com/banh-nam-hue-12_1631007275.jpg",
+    ingredients: [],
+    customTags: []
+  },
+  {
+    id: "emod87",
+    name: "Bánh Lọc Huế",
+    mealType: "Lunch",
+    imageUrl: "https://huesmiletravel.com.vn/wp-content/uploads/2024/04/Banh-loc-Hue-1.jpg",
+    ingredients: [],
+    customTags: []
+  },
+  {
+    id: "tz4pv",
+    name: "Bánh Tráng Trộn",
+    mealType: "Lunch",
+    imageUrl: "https://cdn.tgdd.vn/Files/2017/03/12/959979/cach-lam-banh-trang-tron-tai-nha-ngon-cung-nuoc-sot-dam-vi-202202251706317489.jpg",
+    ingredients: [],
+    customTags: []
   }
 ];
 
