@@ -30,6 +30,7 @@ type View = 'Menu' | 'Planner' | 'Grocery' | 'Diary' | 'Flagged' | 'Settings';
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('Menu');
   const [activeMealType, setActiveMealType] = useState<'All' | 'Morning' | 'Lunch' | 'Snack'>('All');
+  const [activeSubCategory, setActiveSubCategory] = useState<'All' | 'SOUP' | 'OTHERS'>('All');
   const [isAddPanelOpen, setIsAddPanelOpen] = useState(false);
   const [isDiaryOpen, setIsDiaryOpen] = useState(false);
   const [selectedDish, setSelectedDish] = useState<Dish | null>(null);
@@ -48,12 +49,20 @@ const App: React.FC = () => {
   const filteredDishes = useMemo(() => {
     return dishes.filter(dish => {
       const matchesType = activeMealType === 'All' || dish.mealType === activeMealType;
+      
+      let matchesSubCategory = true;
+      if (activeMealType === 'Lunch' && activeSubCategory !== 'All') {
+        const hasSoupTag = dish.customTags.some(t => t.toLowerCase() === 'soup');
+        if (activeSubCategory === 'SOUP') matchesSubCategory = hasSoupTag;
+        if (activeSubCategory === 'OTHERS') matchesSubCategory = !hasSoupTag;
+      }
+
       const matchesSearch = dish.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             dish.ingredients.some(i => i.toLowerCase().includes(searchQuery.toLowerCase())) ||
                             dish.customTags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesType && matchesSearch;
+      return matchesType && matchesSubCategory && matchesSearch;
     });
-  }, [dishes, activeMealType, searchQuery]);
+  }, [dishes, activeMealType, activeSubCategory, searchQuery]);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[#F9F8F6] text-[#1A1A1A] font-utilitarian selection:bg-[#8A9A5B]/20">
@@ -128,8 +137,17 @@ const App: React.FC = () => {
                 {activeView === 'Menu' && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col pl-9 mt-2 gap-2 overflow-hidden">
                     {['All', 'Morning', 'Lunch', 'Snack'].map((type) => (
-                      <button key={type} onClick={() => setActiveMealType(type as any)} className={`text-[10px] text-left font-bold uppercase tracking-widest transition-colors ${activeMealType === type ? 'text-[#8A9A5B]' : 'text-gray-400 hover:text-[#1A1A1A]'}`}>{type}</button>
+                      <button key={type} onClick={() => { setActiveMealType(type as any); setActiveSubCategory('All'); }} className={`text-[10px] text-left font-bold uppercase tracking-widest transition-colors ${activeMealType === type ? 'text-[#8A9A5B]' : 'text-gray-400 hover:text-[#1A1A1A]'}`}>{type}</button>
                     ))}
+                    {activeMealType === 'Lunch' && (
+                      <div className="flex flex-col gap-2 mt-2 pl-2 border-l border-structural">
+                        {['All', 'SOUP', 'OTHERS'].map((subType) => (
+                          <button key={subType} onClick={() => setActiveSubCategory(subType as any)} className={`text-[9px] text-left font-bold uppercase tracking-widest transition-colors ${activeSubCategory === subType ? 'text-[#8A9A5B]' : 'text-gray-400 hover:text-[#1A1A1A]'}`}>
+                            {subType === 'All' ? 'All Lunch' : subType}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -205,19 +223,37 @@ const App: React.FC = () => {
       <main className="flex-1 p-6 md:p-14 overflow-y-auto max-h-screen pb-24 md:pb-14">
         {/* Mobile Filter Pills (Sticky) */}
         {activeView === 'Menu' && (
-          <div className="md:hidden flex gap-2 overflow-x-auto pb-4 mb-4 no-scrollbar">
-            {['All', 'Morning', 'Lunch', 'Snack'].map((type) => (
-              <button
-                key={type}
-                onClick={() => setActiveMealType(type as any)}
-                className={clsx(
-                  "px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap",
-                  activeMealType === type ? "bg-[#1A1A1A] text-white border-[#1A1A1A]" : "bg-white text-gray-400 border-structural"
-                )}
-              >
-                {type}
-              </button>
-            ))}
+          <div className="md:hidden flex flex-col gap-2 pb-4 mb-4">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              {['All', 'Morning', 'Lunch', 'Snack'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => { setActiveMealType(type as any); setActiveSubCategory('All'); }}
+                  className={clsx(
+                    "px-4 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap",
+                    activeMealType === type ? "bg-[#1A1A1A] text-white border-[#1A1A1A]" : "bg-white text-gray-400 border-structural"
+                  )}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+            {activeMealType === 'Lunch' && (
+              <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                {['All', 'SOUP', 'OTHERS'].map((subType) => (
+                  <button
+                    key={subType}
+                    onClick={() => setActiveSubCategory(subType as any)}
+                    className={clsx(
+                      "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap",
+                      activeSubCategory === subType ? "bg-[#8A9A5B] text-white border-[#8A9A5B]" : "bg-transparent text-gray-400 border-structural"
+                    )}
+                  >
+                    {subType === 'All' ? 'All Lunch' : subType}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
         <AnimatePresence mode="wait">

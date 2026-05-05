@@ -141,6 +141,11 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
                 <span className="text-[10px] uppercase font-bold tracking-widest text-[#8A9A5B] bg-gray-100 px-2 py-1 border border-gray-200">
                   {dish.mealType}
                 </span>
+                {dish.mealType === 'Lunch' && (
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-white bg-[#8A9A5B] px-2 py-1">
+                    {dish.customTags.some(t => t.toLowerCase() === 'soup') ? 'SOUP' : 'OTHERS'}
+                  </span>
+                )}
                 {dishHasFlagged && (
                   <span className="text-[10px] uppercase font-bold tracking-widest bg-[#FF5722] text-white px-2 py-1 flex items-center gap-1">
                     <AlertOctagon size={12} /> Contains Flagged
@@ -196,21 +201,23 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
                 {/* Edit Form Fields */}
                 {isEditing && (
                   <div className="flex flex-col gap-6 p-6 border-structural border-dashed">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Meal Category</label>
-                      <div className="flex gap-2">
-                        {(['Morning', 'Lunch', 'Snack'] as MealType[]).map(type => (
-                          <button 
-                            key={type}
-                            onClick={() => setEditMealType(type)}
-                            className={clsx(
-                              "flex-1 py-2 text-[10px] font-bold uppercase border-structural",
-                              editMealType === type ? "bg-[#1A1A1A] text-white" : "bg-white hover:bg-gray-100"
-                            )}
-                          >
-                            {type}
-                          </button>
-                        ))}
+                    <div className="grid grid-cols-1 gap-6">
+                      <div className="flex flex-col gap-2">
+                        <label className="text-[10px] uppercase font-bold tracking-widest text-gray-400">Meal Category</label>
+                        <div className="flex gap-2">
+                          {(['Morning', 'Lunch', 'Snack'] as MealType[]).map(type => (
+                            <button 
+                              key={type}
+                              onClick={() => setEditMealType(type)}
+                              className={clsx(
+                                "flex-1 py-2 text-[10px] font-bold uppercase border-structural",
+                                editMealType === type ? "bg-[#1A1A1A] text-white" : "bg-white hover:bg-gray-100"
+                              )}
+                            >
+                              {type}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">

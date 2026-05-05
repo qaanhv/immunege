@@ -176,21 +176,23 @@ export const AddDishPanel: React.FC<{ isOpen: boolean; onClose: () => void }> = 
                 </div>
 
                 {/* Category & Tags */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Category</label>
-                    <div className="grid grid-cols-3 gap-1">
-                      {(['Morning', 'Lunch', 'Snack'] as MealType[]).map((type) => (
-                        <button
-                          key={type} onClick={() => setMealType(type)}
-                          className={clsx(
-                            "py-2 text-[10px] uppercase font-bold border-structural transition-all",
-                            mealType === type ? "bg-[#1A1A1A] text-white" : "bg-white hover:bg-gray-100"
-                          )}
-                        >
-                          {type}
-                        </button>
-                      ))}
+                <div className="flex flex-col gap-6">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[10px] uppercase tracking-widest font-bold text-gray-400">Category</label>
+                      <div className="grid grid-cols-3 gap-1">
+                        {(['Morning', 'Lunch', 'Snack'] as MealType[]).map((type) => (
+                          <button
+                            key={type} onClick={() => setMealType(type)}
+                            className={clsx(
+                              "py-2 text-[10px] uppercase font-bold border-structural transition-all",
+                              mealType === type ? "bg-[#1A1A1A] text-white" : "bg-white hover:bg-gray-100"
+                            )}
+                          >
+                            {type}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
