@@ -49,9 +49,16 @@ export const DishCard: React.FC<DishCardProps> = memo(({ dish, onSelect }) => {
         
         {/* Subtle Category and Tags */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#8A9A5B] flex-shrink-0">
-            {dish.mealType}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[9px] uppercase font-bold tracking-[0.2em] text-[#8A9A5B] flex-shrink-0">
+              {dish.mealType}
+            </span>
+            {dish.mealType === 'Lunch' && (
+              <span className="text-[7px] px-1 bg-gray-100 text-gray-500 font-black tracking-widest border border-gray-200">
+                {dish.customTags.some(t => t.toLowerCase() === 'soup') ? 'SOUP' : 'OTHERS'}
+              </span>
+            )}
+          </div>
           <div className="flex flex-nowrap gap-1 overflow-hidden">
             {dish.customTags?.slice(0, 2).map(tag => (
               <span 

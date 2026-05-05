@@ -140,13 +140,30 @@ const App: React.FC = () => {
                       <button key={type} onClick={() => { setActiveMealType(type as any); setActiveSubCategory('All'); }} className={`text-[10px] text-left font-bold uppercase tracking-widest transition-colors ${activeMealType === type ? 'text-[#8A9A5B]' : 'text-gray-400 hover:text-[#1A1A1A]'}`}>{type}</button>
                     ))}
                     {activeMealType === 'Lunch' && (
-                      <div className="flex flex-col gap-2 mt-2 pl-2 border-l border-structural">
+                      <motion.div 
+                        initial={{ opacity: 0, x: -5 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex flex-col gap-2.5 mt-4 pl-4 border-l-[1.5px] border-[#8A9A5B]/20"
+                      >
                         {['All', 'SOUP', 'OTHERS'].map((subType) => (
-                          <button key={subType} onClick={() => setActiveSubCategory(subType as any)} className={`text-[9px] text-left font-bold uppercase tracking-widest transition-colors ${activeSubCategory === subType ? 'text-[#8A9A5B]' : 'text-gray-400 hover:text-[#1A1A1A]'}`}>
-                            {subType === 'All' ? 'All Lunch' : subType}
+                          <button 
+                            key={subType} 
+                            onClick={() => setActiveSubCategory(subType as any)} 
+                            className={clsx(
+                              "text-[8px] text-left font-black uppercase tracking-[0.25em] transition-all flex items-center group/sub relative",
+                              activeSubCategory === subType ? 'text-[#1A1A1A]' : 'text-gray-300 hover:text-gray-500'
+                            )}
+                          >
+                            {activeSubCategory === subType && (
+                              <motion.span 
+                                layoutId="activeDot"
+                                className="absolute -left-[18px] w-1 h-1 rounded-full bg-[#8A9A5B]"
+                              />
+                            )}
+                            {subType === 'All' ? 'Complete Menu' : subType}
                           </button>
                         ))}
-                      </div>
+                      </motion.div>
                     )}
                   </motion.div>
                 )}
@@ -159,10 +176,16 @@ const App: React.FC = () => {
           </div>
 
           {activeView === 'Menu' && (
-            <div className="pt-6 border-t border-structural">
+            <div className="pt-8 border-t border-gray-100">
               <div className="relative group">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 transition-colors" />
-                <input type="text" placeholder="Find a dish..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-9 pr-4 py-2 bg-gray-50 border-structural text-[10px] font-bold uppercase tracking-widest outline-none focus:bg-white focus:border-[#8A9A5B] transition-all" />
+                <Search size={14} className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#8A9A5B] transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="SEARCH DISHES..." 
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)} 
+                  className="w-full pl-7 pr-4 py-2 bg-transparent border-b border-gray-100 text-[9px] font-black uppercase tracking-[0.2em] outline-none focus:border-[#8A9A5B] transition-all placeholder:text-gray-200" 
+                />
               </div>
             </div>
           )}
@@ -239,17 +262,19 @@ const App: React.FC = () => {
               ))}
             </div>
             {activeMealType === 'Lunch' && (
-              <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
                 {['All', 'SOUP', 'OTHERS'].map((subType) => (
                   <button
                     key={subType}
                     onClick={() => setActiveSubCategory(subType as any)}
                     className={clsx(
-                      "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap",
-                      activeSubCategory === subType ? "bg-[#8A9A5B] text-white border-[#8A9A5B]" : "bg-transparent text-gray-400 border-structural"
+                      "px-4 py-2 text-[8px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                      activeSubCategory === subType 
+                        ? "bg-[#1A1A1A] text-[#F9F8F6] shadow-xl shadow-black/20" 
+                        : "bg-white text-gray-400 border border-gray-100"
                     )}
                   >
-                    {subType === 'All' ? 'All Lunch' : subType}
+                    {subType === 'All' ? 'ENTIRE LUNCH' : subType}
                   </button>
                 ))}
               </div>
