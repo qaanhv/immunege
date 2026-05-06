@@ -41,8 +41,8 @@ export const DishCard: React.FC<DishCardProps> = memo(({ dish, onSelect }) => {
 
       {/* Content Area - Fixed height for grid uniformity */}
       <div className="p-3 md:p-4 flex flex-col gap-1.5 h-24 justify-between bg-white">
-        <div className="flex justify-between items-start overflow-hidden">
-          <h3 className="font-editorial text-xl md:text-2xl leading-none group-hover:text-[#8A9A5B] transition-colors truncate w-full" title={dish.name}>
+        <div className="flex justify-between items-start py-0.5">
+          <h3 className="font-editorial text-xl md:text-2xl leading-snug group-hover:text-[#8A9A5B] transition-colors truncate w-full" title={dish.name}>
             {dish.name}
           </h3>
         </div>

@@ -179,12 +179,12 @@ export const DishDetailPanel: React.FC<DishDetailPanelProps> = ({ dish, onClose 
                 {/* Title & Edit Trigger */}
                 <div className="flex justify-between items-start gap-4">
                   {!isEditing ? (
-                    <h2 className="font-editorial text-4xl md:text-5xl leading-tight">{dish.name}</h2>
+                    <h2 className="font-editorial text-4xl md:text-5xl leading-snug">{dish.name}</h2>
                   ) : (
                     <input 
                       value={editName}
                       onChange={e => setEditName(e.target.value)}
-                      className="flex-1 font-editorial text-4xl bg-transparent border-structural-b focus:outline-none focus:border-[#8A9A5B]"
+                      className="flex-1 font-editorial text-4xl bg-transparent border-structural-b py-1 focus:outline-none focus:border-[#8A9A5B]"
                     />
                   )}
                   <button 

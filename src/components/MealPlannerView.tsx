@@ -83,7 +83,7 @@ export const MealPlannerView: React.FC = () => {
                                <span className="text-[10px] uppercase tracking-widest font-bold text-[#8A9A5B] block mb-1">
                                  {plan.slot}
                                </span>
-                               <h4 className="font-editorial text-xl">{dish.name}</h4>
+                               <h4 className="font-editorial text-xl leading-snug">{dish.name}</h4>
                              </div>
                              
                              <button 
