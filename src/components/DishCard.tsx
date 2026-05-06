@@ -39,10 +39,10 @@ export const DishCard: React.FC<DishCardProps> = memo(({ dish, onSelect }) => {
         </div>
       </div>
 
-      {/* Content Area - Dynamic height for full titles */}
-      <div className="p-3 md:p-4 flex flex-col gap-1.5 min-h-24 justify-between bg-white">
-        <div className="flex justify-between items-start py-0.5">
-          <h3 className="font-editorial text-xl md:text-2xl leading-snug group-hover:text-[#8A9A5B] transition-colors w-full" title={dish.name}>
+      {/* Content Area - Fixed uniform height with responsive premium typography */}
+      <div className="p-3.5 flex flex-col gap-1 h-24 justify-between bg-white">
+        <div className="flex justify-between items-start">
+          <h3 className="font-editorial text-base md:text-lg leading-tight group-hover:text-[#8A9A5B] transition-colors w-full" title={dish.name}>
             {dish.name}
           </h3>
         </div>
